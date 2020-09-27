@@ -235,9 +235,16 @@ DataTypes.isEqual(
 <br/>
 <br/>
 
-### DataTypes.isObjectContainsObject(bigObject:Object, smallObject:Object): boolean
+### DataTypes.isObjectContainsObject(p:{bigObject:Object, smallObject:Object, ignoreCaseInStringValues?:boolean, ignoreEmptySmallObject?:boolean}):boolean
 
 Check if object contains another object
+
+__Parameters__
+* `bigObject:Object` - big object to check 
+* `smallObject:Object` - small object
+* `ignoreCaseInStringValues?:boolean` - ignore case for strings when compare
+* `ignoreEmptySmallObject?:boolean` - if true the function returns false if small object is empty
+
 
 ```typescript
 const big =   {a:'a', b:true, c:3, d:false}
