@@ -248,46 +248,59 @@ __Parameters__
 __Examples__
 
 ```typescript
-const big =   {a:'a', b:true, c:3, d:false}
-const small = {a:'a', b:true, c:3}
-DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // true
+DataTypes.isObjectContainsObject({
+    bigObject: {a:'a', b:true, c:3, d:false}, 
+    smallObject: {a:'a', b:true, c:3}
+}) // true
 ```
 
 ```typescript
-const big =   {a:'a', b:{b1:'b1', b2:'b2'}, c:'c', d:new Date(2019,12,10)}
-const small = {a:'a', b:{b1:'b1'}, d:new Date(2019,12,10)}
-DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // true
+DataTypes.isObjectContainsObject({
+    bigObject: {a:'a', b:{b1:'b1', b2:'b2'}, c:'c', d:new Date(2019,12,10)}, 
+    smallObject: {a:'a', b:{b1:'b1'}, d:new Date(2019,12,10)}
+}) // true
 ```
 
 ```typescript
-const big =   {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}
+const big =   
 const small = {}
-DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // true
-DataTypes.isObjectContainsObject({bigObject: big, smallObject: small, ignoreEmptySmallObject: true}) // false
+DataTypes.isObjectContainsObject({
+    bigObject: {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}, 
+    smallObject: {}
+}) // true
+
+DataTypes.isObjectContainsObject({
+    bigObject: {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}, 
+    smallObject: {},
+    ignoreEmptySmallObject: true
+}) // false
 ```
 
 ```typescript
-const small = {a: 'AAA'}
-const big = {a:'aaa', b:'b', d:new Date(2019,10,11)}
-    DataTypes.isObjectContainsObject({ 
-        bigObject: big, 
-        smallObject: small, 
-        ignoreCaseInStringValues: true
-    }) //true
+DataTypes.isObjectContainsObject({ 
+    bigObject: {a:'aaa', b:'b', d:new Date(2019,10,11)}, 
+    smallObject: {a: 'AAA'}, 
+    ignoreCaseInStringValues: true
+}) //true
 
-    DataTypes.isObjectContainsObject({ 
-        bigObject: big, 
-        smallObject: small, 
-        ignoreCaseInStringValues: false
-    }) //false
+DataTypes.isObjectContainsObject({ 
+    bigObject: {a:'aaa', b:'b', d:new Date(2019,10,11)}, 
+    smallObject: {a: 'AAA'}, 
+    ignoreCaseInStringValues: false
+}) //false
 ```
 
 ```typescript
-const big =    {date:new Date(2019,10,11)}
-const small =  {date:new Date(2019,10,10)}
-const small2 = {date:new Date(2019,10,11)}
-DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // false
-DataTypes.isObjectContainsObject({bigObject: big, smallObject: small2}) // true
+DataTypes.isObjectContainsObject({
+    bigObject: {date:new Date(2019,10,11)},
+    smallObject: {date:new Date(2019,10,10)}
+}) // false
+
+DataTypes.isObjectContainsObject({
+    bigObject: {date:new Date(2019,10,11)},
+    smallObject: {date:new Date(2019,10,11)}
+}) // true
+
 ```
 
 <br/>
