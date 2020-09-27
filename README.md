@@ -262,8 +262,6 @@ DataTypes.isObjectContainsObject({
 ```
 
 ```typescript
-const big =   
-const small = {}
 DataTypes.isObjectContainsObject({
     bigObject: {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}, 
     smallObject: {}
