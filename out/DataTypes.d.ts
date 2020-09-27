@@ -9,7 +9,6 @@ export declare module DataTypes {
      */
     function isObject(o: any): boolean;
     function isObjectWithKeys(o: any): boolean;
-    function isIterableObject(o: any): boolean;
     function isString(x: any): boolean;
     function isNumber(x: any): boolean;
     function isNullOrUndefined(x: any): boolean;
@@ -24,18 +23,34 @@ export declare module DataTypes {
      * compare if two variable are the same
      * @param x any valid json-like object, not instance of some custom class
      * @param y any valid json-like object, not instance of some custom class
+     * @param options {ignoreCaseInstrings:boolean} - ignore case in strings and in string-values for objects
      */
-    function isEqual(x: any, y: any): boolean;
-    function isObjectContainsObject(bigObject: Object, smallObject: Object): boolean;
+    function isEqual(x: any, y: any, options?: {
+        ignoreCaseInStrings: boolean;
+    }): boolean;
     /**
-      * creates new object without keys by defined predicate keysToRemove
+     * Check if object contains another object
+     * @param {Object} p options
+     * @param {Object} p.bigObject
+     * @param {Object} p.smallObject
+     * @param {boolean|undefined} p.ignoreCaseInStringValues
+     * @param {boolean|undefined} p.ignoreEmptySmallObject when true, function returns false if small object is empty
+     */
+    function isObjectContainsObject(p: {
+        bigObject: Object;
+        smallObject: Object;
+        ignoreCaseInStringValues?: boolean;
+        ignoreEmptySmallObject?: boolean;
+    }): boolean;
+    /**
+      * Returns a new object only with keys specified by predicate function
       * @param o
       * @param keysToRemove
       * @param recursive
       */
     function filterObjectByKeys(o: any, keysToCopy: (key: string) => boolean, recursive?: boolean): object;
     /**
-     * check if no instances of classes in object
+     * Check if no instances of classes in object
      * @param json
      */
     function isValidJsonObject(json: any): boolean;

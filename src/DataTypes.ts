@@ -80,11 +80,15 @@ export module DataTypes {
      * compare if two variable are the same
      * @param x any valid json-like object, not instance of some custom class
      * @param y any valid json-like object, not instance of some custom class
+     * @param options {ignoreCaseInstrings:boolean} - ignore case in strings and in string-values for objects
      */
-    export function isEqual(x: any, y: any): boolean {
+    export function isEqual(x: any, y: any, options?:{ignoreCaseInStrings:boolean}): boolean {
         if (x === y) return true
         if (isPrimitive(x)) {
             if (isPrimitive(y)) {
+                if(typeof x === 'string' && typeof y === 'string' && options?.ignoreCaseInStrings){
+                    return x.toLocaleLowerCase() === y.toLocaleLowerCase()
+                }
                 return x === y
             }
             return false
@@ -104,37 +108,53 @@ export module DataTypes {
         //if (isObject(x) && isObject(y) && isValidJsonObject(x) && isValidJsonObject(y)) {
         if(isIterableObject(x) && isIterableObject(y)){
             for (let [k, v] of Object.entries(x)) {
-                if (isEqual(v, y[k]) == false) return false
+                if (isEqual(v, y[k], options) == false) return false
             }
             return true
         }
         return false
     }
 
+
     /**
-     * Return true if object contains another object
-     * @param bigObject 
-     * @param smallObject 
+     * Check if object contains another object
+     * @param {Object} p options
+     * @param {Object} p.bigObject
+     * @param {Object} p.smallObject 
+     * @param {boolean|undefined} p.ignoreCaseInStringValues
+     * @param {boolean|undefined} p.ignoreEmptySmallObject when true, function returns false if small object is empty
      */
-    export function isObjectContainsObject(bigObject:Object, smallObject:Object):boolean{
+    export function isObjectContainsObject(p:{bigObject:Object, smallObject:Object, ignoreCaseInStringValues?:boolean, ignoreEmptySmallObject?:boolean}):boolean{
         /*
             small = {a:'a', b:{b1:'b1'}}
             big =  {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}
         */
-        if(isIterableObject(smallObject) && isIterableObject(bigObject)){
+        if(isIterableObject(p.smallObject) && isIterableObject(p.bigObject)){
             //ok
         } else return false
 
-        if(Object.entries(smallObject).length == 0) return true // {} is subObject of any other object
-        for(let [smallKey, smallValue] of Object.entries(smallObject)){
-            if(bigObject.hasOwnProperty(smallKey) == false) return false
+        if(Object.entries(p.smallObject).length == 0) { // empty object
+            if(p.ignoreEmptySmallObject){
+                return false
+            }
+
+            return true // empty object is subObject of any other object
+        }
+
+        for(let [smallKey, smallValue] of Object.entries(p.smallObject)){
+            if(p.bigObject.hasOwnProperty(smallKey) == false) return false
             if(isIterableObject(smallValue)){
                 // compare recursievly
                 //console.log('[Data] iterable', smallValue, 'so recursive compare')
-                if(isObjectContainsObject(bigObject[smallKey], smallValue) == false) return false
+                if(isObjectContainsObject({ 
+                    bigObject: p.bigObject[smallKey], 
+                    smallObject: smallValue, 
+                    ignoreCaseInStringValues: p.ignoreCaseInStringValues, 
+                    ignoreEmptySmallObject: p.ignoreEmptySmallObject
+                }) === false) return false
             } else {
                 //console.log('[Data] compare by isEqual', smallValue, bigObject[smallKey])
-                if(isEqual(smallValue, bigObject[smallKey]) == false) return false
+                if(isEqual(smallValue, p.bigObject[smallKey], {ignoreCaseInStrings: p.ignoreCaseInStringValues ?? false}) === false) return false
             }
         }
         return true

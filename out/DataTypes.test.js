@@ -126,7 +126,7 @@ test('isEqual (10)', function () {
 });
 test('isEqual (11)', function () {
     var x = { a: 'aa', b: 'bb' };
-    var y = { a: 'aa', b: 'bb' };
+    var y = { b: 'bb', a: 'aa' };
     expect(DataTypes_1.DataTypes.isEqual(x, y)).toEqual(true);
 });
 test('isEqual (12)', function () {
@@ -197,32 +197,55 @@ test('isEqual (14)', function () {
 test('isObjectContainsObject (1)', function () {
     var small = { a: 'a', b: true, c: 3 };
     var big = { a: 'a', b: true, c: 3, d: false };
-    expect(DataTypes_1.DataTypes.isObjectContainsObject(big, small)).toEqual(true);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({ bigObject: big, smallObject: small })).toEqual(true);
 });
 test('isObjectContainsObject (2)', function () {
     var small = { a: 'a', b: { b1: 'b1' }, d: new Date(2019, 12, 10) };
     var big = { a: 'a', b: { b1: 'b1', b2: 'b2' }, c: 'c', d: new Date(2019, 12, 10) };
-    expect(DataTypes_1.DataTypes.isObjectContainsObject(big, small)).toEqual(true);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({ bigObject: big, smallObject: small })).toEqual(true);
 });
 test('isObjectContainsObject (3)', function () {
     var small = {};
     var big = { a: 'a', b: { b1: 'b1', b2: 'b2' }, c: 'c' };
-    expect(DataTypes_1.DataTypes.isObjectContainsObject(big, small)).toEqual(true);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({ bigObject: big, smallObject: small })).toEqual(true);
 });
 test('isObjectContainsObject (4)', function () {
     var small = { date: new Date(2019, 10, 10) };
     var big = { date: new Date(2019, 10, 11) };
-    expect(DataTypes_1.DataTypes.isObjectContainsObject(big, small)).toEqual(false);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({ bigObject: big, smallObject: small })).toEqual(false);
 });
 test('isObjectContainsObject (5)', function () {
     var small = { date: new Date(2019, 10, 20) };
     var big = { date: new Date(2019, 10, 20) };
-    expect(DataTypes_1.DataTypes.isObjectContainsObject(big, small)).toEqual(true);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({ bigObject: big, smallObject: small })).toEqual(true);
 });
 test('isObjectContainsObject (6)', function () {
     var small = { a: 'a', d: new Date(2019, 10, 10) };
     var big = { a: 'a', b: 'b', d: new Date(2019, 10, 11) };
-    expect(DataTypes_1.DataTypes.isObjectContainsObject(big, small)).toEqual(false);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({ bigObject: big, smallObject: small })).toEqual(false);
+});
+test('isObjectContainsObject (7)', function () {
+    var small = {};
+    var big = { a: 'a', b: 'b', d: new Date(2019, 10, 11) };
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({
+        bigObject: big,
+        smallObject: small,
+        ignoreEmptySmallObject: true
+    })).toEqual(false);
+});
+test('isObjectContainsObject (8)', function () {
+    var small = { a: 'AAA' };
+    var big = { a: 'aaa', b: 'b', d: new Date(2019, 10, 11) };
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({
+        bigObject: big,
+        smallObject: small,
+        ignoreCaseInStringValues: true
+    })).toEqual(true);
+    expect(DataTypes_1.DataTypes.isObjectContainsObject({
+        bigObject: big,
+        smallObject: small,
+        ignoreCaseInStringValues: false
+    })).toEqual(false);
 });
 test('isObjectWithKeys (1)', function () {
     var x = { a: 'a', b: true };
@@ -279,3 +302,12 @@ test('checkIfValueExistsInEnum', function () {
     expect(DataTypes_1.DataTypes.isValueExistsInEnum(100, EnumForTestNumber)).toBeFalsy();
     expect(DataTypes_1.DataTypes.isValueExistsInEnum(undefined, EnumForTestNumber)).toBeFalsy();
 });
+// test('iterable object', () => {
+//     expect(DataTypes.isIterableObject([1,2,3])).toBeTruthy()
+//     expect(DataTypes.isIterableObject([])).toBeTruthy()
+//     expect(DataTypes.isIterableObject({})).toBeTruthy()
+//     expect(DataTypes.isIterableObject({a:'a', b:'b'})).toBeTruthy()
+//     expect(DataTypes.isIterableObject(123)).toBeFalsy()
+//     expect(DataTypes.isIterableObject('some string')).toBeTruthy()
+//     expect(DataTypes.isIterableObject(new Date())).toBeFalsy()
+// })
