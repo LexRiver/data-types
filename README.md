@@ -245,31 +245,49 @@ __Parameters__
 * `ignoreCaseInStringValues?:boolean` - ignore case for strings when compare
 * `ignoreEmptySmallObject?:boolean` - if true the function returns false if small object is empty
 
+__Examples__
 
 ```typescript
 const big =   {a:'a', b:true, c:3, d:false}
 const small = {a:'a', b:true, c:3}
-DataTypes.isObjectContainsObject(big, small) // true
+DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // true
 ```
 
 ```typescript
 const big =   {a:'a', b:{b1:'b1', b2:'b2'}, c:'c', d:new Date(2019,12,10)}
 const small = {a:'a', b:{b1:'b1'}, d:new Date(2019,12,10)}
-DataTypes.isObjectContainsObject(big, small) // true
+DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // true
 ```
 
 ```typescript
 const big =   {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}
 const small = {}
-DataTypes.isObjectContainsObject(big, small) // true
+DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // true
+DataTypes.isObjectContainsObject({bigObject: big, smallObject: small, ignoreEmptySmallObject: true}) // false
+```
+
+```typescript
+const small = {a: 'AAA'}
+const big = {a:'aaa', b:'b', d:new Date(2019,10,11)}
+    DataTypes.isObjectContainsObject({ 
+        bigObject: big, 
+        smallObject: small, 
+        ignoreCaseInStringValues: true
+    }) //true
+
+    DataTypes.isObjectContainsObject({ 
+        bigObject: big, 
+        smallObject: small, 
+        ignoreCaseInStringValues: false
+    }) //false
 ```
 
 ```typescript
 const big =    {date:new Date(2019,10,11)}
 const small =  {date:new Date(2019,10,10)}
 const small2 = {date:new Date(2019,10,11)}
-DataTypes.isObjectContainsObject(big, small) // false
-DataTypes.isObjectContainsObject(big, small2) // true
+DataTypes.isObjectContainsObject({bigObject: big, smallObject: small}) // false
+DataTypes.isObjectContainsObject({bigObject: big, smallObject: small2}) // true
 ```
 
 <br/>
