@@ -80,7 +80,7 @@ export module DataTypes {
      * compare if two variable are the same
      * @param x any valid json-like object, not instance of some custom class
      * @param y any valid json-like object, not instance of some custom class
-     * @param options {ignoreCaseInstrings:boolean} - ignore case in strings and in string-values for objects
+     * @param options {ignoreCaseInStrings:boolean} - ignore case in strings and in string-values for objects
      */
     export function isEqual(x: any, y: any, options?:{ignoreCaseInStrings:boolean}): boolean {
         if (x === y) return true
@@ -107,6 +107,7 @@ export module DataTypes {
         }
         //if (isObject(x) && isObject(y) && isValidJsonObject(x) && isValidJsonObject(y)) {
         if(isIterableObject(x) && isIterableObject(y)){
+            if(Object.keys(x).length !== Object.keys(y).length) return false
             for (let [k, v] of Object.entries(x)) {
                 if (isEqual(v, y[k], options) == false) return false
             }

@@ -105,7 +105,7 @@ var DataTypes;
      * compare if two variable are the same
      * @param x any valid json-like object, not instance of some custom class
      * @param y any valid json-like object, not instance of some custom class
-     * @param options {ignoreCaseInstrings:boolean} - ignore case in strings and in string-values for objects
+     * @param options {ignoreCaseInStrings:boolean} - ignore case in strings and in string-values for objects
      */
     function isEqual(x, y, options) {
         var e_1, _a;
@@ -138,6 +138,8 @@ var DataTypes;
         }
         //if (isObject(x) && isObject(y) && isValidJsonObject(x) && isValidJsonObject(y)) {
         if (isIterableObject(x) && isIterableObject(y)) {
+            if (Object.keys(x).length !== Object.keys(y).length)
+                return false;
             try {
                 for (var _c = __values(Object.entries(x)), _d = _c.next(); !_d.done; _d = _c.next()) {
                     var _e = __read(_d.value, 2), k = _e[0], v = _e[1];
