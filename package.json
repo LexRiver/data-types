@@ -1,13 +1,20 @@
 {
     "sideEffects": false,
     "name": "@lexriver/data-types",
-    "version": "3.0.0",
+    "version": "3.0.4",
     "description": "Check type of a variable",
     "type": "module",
-    "exports": "./src/DataTypes.ts",
+    "exports": {
+        "./*": {
+            "import": "./out/src/*.mjs",
+            "default": "./out/src/*.mjs"
+        }
+    },
     "scripts": {
         "test": "vitest",
-        "build": "rimraf out && tsc"
+        "compile": "tsc",
+        "clean": "rimraf out",
+        "build": "npm run clean && npm run compile"
     },
     "keywords": [
         "type checker",
