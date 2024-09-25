@@ -1,33 +1,4 @@
-"use strict";
-var __values = (this && this.__values) || function(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-};
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var DataTypes;
+export var DataTypes;
 (function (DataTypes) {
     function isFunction(x) {
         return typeof x === 'function';
@@ -108,13 +79,11 @@ var DataTypes;
      * @param options {ignoreCaseInStrings:boolean} - ignore case in strings and in string-values for objects
      */
     function isEqual(x, y, options) {
-        var e_1, _a;
-        var _b;
         if (x === y)
             return true;
         if (isPrimitive(x)) {
             if (isPrimitive(y)) {
-                if (typeof x === 'string' && typeof y === 'string' && ((_b = options) === null || _b === void 0 ? void 0 : _b.ignoreCaseInStrings)) {
+                if (typeof x === 'string' && typeof y === 'string' && options?.ignoreCaseInStrings) {
                     return x.toLocaleLowerCase() === y.toLocaleLowerCase();
                 }
                 return x === y;
@@ -130,7 +99,7 @@ var DataTypes;
             return x.getTime() == y.getTime();
         }
         if (isArray(x) && isArray(y) && x.length == y.length) {
-            for (var i = 0; i < x.length; i++) {
+            for (let i = 0; i < x.length; i++) {
                 if (isEqual(x[i], y[i]) == false)
                     return false;
             }
@@ -140,19 +109,9 @@ var DataTypes;
         if (isIterableObject(x) && isIterableObject(y)) {
             if (Object.keys(x).length !== Object.keys(y).length)
                 return false;
-            try {
-                for (var _c = __values(Object.entries(x)), _d = _c.next(); !_d.done; _d = _c.next()) {
-                    var _e = __read(_d.value, 2), k = _e[0], v = _e[1];
-                    if (isEqual(v, y[k], options) == false)
-                        return false;
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-                }
-                finally { if (e_1) throw e_1.error; }
+            for (let [k, v] of Object.entries(x)) {
+                if (isEqual(v, y[k], options) == false)
+                    return false;
             }
             return true;
         }
@@ -168,8 +127,6 @@ var DataTypes;
      * @param {boolean|undefined} p.ignoreEmptySmallObject when true, function returns false if small object is empty
      */
     function isObjectContainsObject(p) {
-        var e_2, _a;
-        var _b;
         /*
             small = {a:'a', b:{b1:'b1'}}
             big =  {a:'a', b:{b1:'b1', b2:'b2'}, c:'c'}
@@ -185,35 +142,25 @@ var DataTypes;
             }
             return true; // empty object is subObject of any other object
         }
-        try {
-            for (var _c = __values(Object.entries(p.smallObject)), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var _e = __read(_d.value, 2), smallKey = _e[0], smallValue = _e[1];
-                if (p.bigObject.hasOwnProperty(smallKey) == false)
+        for (let [smallKey, smallValue] of Object.entries(p.smallObject)) {
+            if (p.bigObject.hasOwnProperty(smallKey) == false)
+                return false;
+            if (isIterableObject(smallValue)) {
+                // compare recursievly
+                //console.log('[Data] iterable', smallValue, 'so recursive compare')
+                if (isObjectContainsObject({
+                    bigObject: p.bigObject[smallKey],
+                    smallObject: smallValue,
+                    ignoreCaseInStringValues: p.ignoreCaseInStringValues,
+                    ignoreEmptySmallObject: p.ignoreEmptySmallObject
+                }) === false)
                     return false;
-                if (isIterableObject(smallValue)) {
-                    // compare recursievly
-                    //console.log('[Data] iterable', smallValue, 'so recursive compare')
-                    if (isObjectContainsObject({
-                        bigObject: p.bigObject[smallKey],
-                        smallObject: smallValue,
-                        ignoreCaseInStringValues: p.ignoreCaseInStringValues,
-                        ignoreEmptySmallObject: p.ignoreEmptySmallObject
-                    }) === false)
-                        return false;
-                }
-                else {
-                    //console.log('[Data] compare by isEqual', smallValue, bigObject[smallKey])
-                    if (isEqual(smallValue, p.bigObject[smallKey], { ignoreCaseInStrings: (_b = p.ignoreCaseInStringValues, (_b !== null && _b !== void 0 ? _b : false)) }) === false)
-                        return false;
-                }
             }
-        }
-        catch (e_2_1) { e_2 = { error: e_2_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+            else {
+                //console.log('[Data] compare by isEqual', smallValue, bigObject[smallKey])
+                if (isEqual(smallValue, p.bigObject[smallKey], { ignoreCaseInStrings: p.ignoreCaseInStringValues ?? false }) === false)
+                    return false;
             }
-            finally { if (e_2) throw e_2.error; }
         }
         return true;
     }
@@ -226,22 +173,21 @@ var DataTypes;
       */
     function filterObjectByKeys(o, keysToCopy, recursive) {
         if (!o)
-            throw new Error("filterObjectByKeys failed, o=" + o);
+            throw new Error(`filterObjectByKeys failed, o=${o}`);
         if (isValidJsonObject(o) == false) {
             console.warn('filterObjectByKeys is trying to filter not a valid json object', 'o=', o);
         }
         try {
             //console.log('#### o=', o)
             if (isArray(o)) {
-                return o.map(function (x) { return filterObjectByKeys(x, keysToCopy, recursive); });
+                return o.map(x => filterObjectByKeys(x, keysToCopy, recursive));
             }
             if (isDate(o)) {
                 return o;
             }
             if (isObject(o)) {
-                var result_1 = {};
-                Object.entries(o).forEach(function (_a) {
-                    var _b = __read(_a, 2), key = _b[0], value = _b[1];
+                let result = {};
+                Object.entries(o).forEach(([key, value]) => {
                     if (keysToCopy(key)) {
                         // modify nested object first
                         if (recursive && value) {
@@ -250,11 +196,11 @@ var DataTypes;
                             //}
                         }
                         //console.log('key=', key, 'value=', value)
-                        result_1[key] = value;
+                        result[key] = value;
                         //console.log('result=', result)
                     }
                 });
-                return result_1;
+                return result;
             }
             return o;
         }
@@ -269,10 +215,9 @@ var DataTypes;
      * @param json
      */
     function isValidJsonObject(json) {
-        var e_3, _a, e_4, _b;
         if (json === null || json === undefined)
             return true;
-        var typeName = json.constructor.name;
+        const typeName = json.constructor.name;
         switch (typeName) {
             case 'Boolean':
             case 'Number':
@@ -280,38 +225,18 @@ var DataTypes;
             case 'Date':
                 return true;
             case 'Object':
-                try {
-                    //iterate object
-                    for (var _c = __values(Object.entries(json)), _d = _c.next(); !_d.done; _d = _c.next()) {
-                        var _e = __read(_d.value, 2), k = _e[0], v = _e[1];
-                        //log.message('k=', k, 'v=', v)
-                        if (isValidJsonObject(v) == false)
-                            return false;
-                    }
-                }
-                catch (e_3_1) { e_3 = { error: e_3_1 }; }
-                finally {
-                    try {
-                        if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-                    }
-                    finally { if (e_3) throw e_3.error; }
+                //iterate object
+                for (let [k, v] of Object.entries(json)) {
+                    //log.message('k=', k, 'v=', v)
+                    if (isValidJsonObject(v) == false)
+                        return false;
                 }
                 return true;
             case 'Array':
-                try {
-                    // iterate array
-                    for (var json_1 = __values(json), json_1_1 = json_1.next(); !json_1_1.done; json_1_1 = json_1.next()) {
-                        var v = json_1_1.value;
-                        if (isValidJsonObject(v) == false)
-                            return false;
-                    }
-                }
-                catch (e_4_1) { e_4 = { error: e_4_1 }; }
-                finally {
-                    try {
-                        if (json_1_1 && !json_1_1.done && (_b = json_1.return)) _b.call(json_1);
-                    }
-                    finally { if (e_4) throw e_4.error; }
+                // iterate array
+                for (let v of json) {
+                    if (isValidJsonObject(v) == false)
+                        return false;
                 }
                 return true;
             default: return false;
@@ -323,7 +248,7 @@ var DataTypes;
     }
     DataTypes.toJson = toJson;
     function isValueExistsInEnum(value, EnumType) {
-        for (var enumValue in EnumType) {
+        for (let enumValue in EnumType) {
             //console.log('enumValue=', enumValue, EnumType[enumValue])
             if (value == EnumType[enumValue])
                 return true;
@@ -331,4 +256,4 @@ var DataTypes;
         return false;
     }
     DataTypes.isValueExistsInEnum = isValueExistsInEnum;
-})(DataTypes = exports.DataTypes || (exports.DataTypes = {}));
+})(DataTypes || (DataTypes = {}));

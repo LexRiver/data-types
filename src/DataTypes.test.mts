@@ -1,4 +1,6 @@
-import { DataTypes } from "./DataTypes"
+// import {describe, expect, test} from '@jest/globals';
+import { expect, test } from 'vitest'
+import { DataTypes } from "./DataTypes.mjs"
 
 
 test('isValidJsonObject', () => {

@@ -1,4 +1,4 @@
-export declare module DataTypes {
+export declare namespace DataTypes {
     function isFunction(x: any): boolean;
     function isClass(x: any): boolean;
     function isClassInstance(classInstance: any, className: any): boolean;
