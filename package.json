@@ -1,15 +1,10 @@
 {
     "sideEffects": false,
     "name": "@lexriver/data-types",
-    "version": "3.0.4",
+    "version": "3.0.5",
     "description": "Check type of a variable",
     "type": "module",
-    "exports": {
-        "./*": {
-            "import": "./out/src/*.mjs",
-            "default": "./out/src/*.mjs"
-        }
-    },
+    "exports": "./out/src/DataTypes.mjs",
     "scripts": {
         "test": "vitest",
         "compile": "tsc",
