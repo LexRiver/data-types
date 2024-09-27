@@ -1,8 +1,8 @@
 {
     "sideEffects": false,
     "name": "@lexriver/data-types",
-    "version": "3.0.5",
-    "description": "Check type of a variable",
+    "version": "3.1.0",
+    "description": "Check type of a variable, compare two values or objects.",
     "type": "module",
     "exports": "./out/src/DataTypes.mjs",
     "scripts": {

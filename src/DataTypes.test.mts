@@ -85,7 +85,7 @@ test('filterObjectByKeys', () => {
 test('isEqual (1)', () => {
     const x = 1
     const y = 1
-    expect(DataTypes.isEqual(x,y)).toEqual(true)
+    expect(DataTypes.isEqual(x,y,{ignoreCaseInStrings:true})).toEqual(true)
 })
 
 test('isEqual (2)', () => {
@@ -216,6 +216,42 @@ test('isEqual (14)', () => {
     const x = {date:new Date(2019,10,10)}
     const y = {date:new Date(2019,10,20)}
     expect(DataTypes.isEqual(x,y)).toEqual(false)
+})
+
+test('isEqual two object with different keys length (1)', () => {
+    const x = {a:'a', b:'b', c:undefined}
+    const y = {a:'a', b:'b', c:null}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:true})).toEqual(true)
+})
+test('isEqual two object with different keys length (2)', () => {
+    const x = {a:'a', b:'b', c:undefined}
+    const y = {a:'a', b:'b'}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:true})).toEqual(true)
+})
+test('isEqual two object with different keys length (3)', () => {
+    const x = {a:'a', b:'b'}
+    const y = {a:'a', b:'b', c:undefined}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:true})).toEqual(true)
+})
+test('isEqual two object with different keys length (4)', () => {
+    const x = {a:'a', b:'b'}
+    const y = {a:'a', b:'b', c:null}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:true})).toEqual(true)
+})
+test('isEqual two object with different keys length (5)', () => {
+    const x = {a:'a', b:'b'}
+    const y = {a:'a', b:'b', c:null}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:false})).toEqual(false)
+})
+test('isEqual two object with different keys length (6)', () => {
+    const x = {a:'a', b:'b', c:undefined}
+    const y = {a:'a', b:'b'}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:false})).toEqual(false)
+})
+test('isEqual two object with different keys length (7)', () => {
+    const x = {a:'a', b:'b', c:''}
+    const y = {a:'a', b:'b'}
+    expect(DataTypes.isEqual(x,y,{ignoreNullAndUndefinedValuesInObject:true})).toEqual(false)
 })
 
 

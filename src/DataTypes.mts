@@ -78,11 +78,13 @@ export namespace DataTypes {
 
     /**
      * compare if two variable are the same
-     * @param x any valid json-like object, not instance of some custom class
-     * @param y any valid json-like object, not instance of some custom class
-     * @param options {ignoreCaseInStrings:boolean} - ignore case in strings and in string-values for objects
+     * @param {any} x any valid json-like object, not instance of some custom class
+     * @param {any} y any valid json-like object, not instance of some custom class
+     * @param {Object} options 
+     * @param {boolean} options.ignoreCaseInStrings ignore case in strings and in string-values for objects
+     * @param {boolean} options.ignoreNullAndUndefinedValuesInObject ignore null and undefined values for objects
      */
-    export function isEqual(x: any, y: any, options?:{ignoreCaseInStrings:boolean}): boolean {
+    export function isEqual(x: any, y: any, options?:{ignoreCaseInStrings?:boolean, ignoreNullAndUndefinedValuesInObject?:boolean}): boolean {
         if (x === y) return true
         if (isPrimitive(x)) {
             if (isPrimitive(y)) {
@@ -107,14 +109,29 @@ export namespace DataTypes {
         }
         //if (isObject(x) && isObject(y) && isValidJsonObject(x) && isValidJsonObject(y)) {
         if(isIterableObject(x) && isIterableObject(y)){
+            if(options?.ignoreNullAndUndefinedValuesInObject){
+                // we need to compare key-values for both objects
+                for(const [k,v] of Object.entries(x)){
+                    if(isNullOrUndefined(v)) continue
+                    if (isEqual(v, y[k], options) == false) return false        
+                }
+                for(const [k,v] of Object.entries(y)){
+                    if(isNullOrUndefined(v)) continue
+                    if (isEqual(v, x[k], options) == false) return false        
+                }
+                return true
+            }
+            
             if(Object.keys(x).length !== Object.keys(y).length) return false
-            for (let [k, v] of Object.entries(x)) {
+            for (const [k, v] of Object.entries(x)) {
                 if (isEqual(v, y[k], options) == false) return false
             }
             return true
         }
         return false
     }
+
+    
 
 
     /**
