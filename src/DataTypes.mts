@@ -1,3 +1,5 @@
+import { FilterByKnownKey, UniqueKeys } from "./Types.mjs";
+
 export namespace DataTypes {
     export function isFunction(x: any):boolean {
         return typeof x === 'function'
@@ -267,6 +269,33 @@ export namespace DataTypes {
         return false
     }
 
+    /**
+     * Type-safe check if object has property
+     * https://stackoverflow.com/questions/70670913/type-safe-in-type-guard
+     * example:
+     * ```
+     * type TypeA = {a:string}
+     * type TypeB = {b:string}
+     * 
+     * function func(param1:TypeA|TypeB){
+     *     if('c' in param1){ // no compilation error
+     *         //...
+     *     }    
+     * 
+     *     if(hasProperty(param1, 'c')){ // compilation error 
+     *         //...
+     *     }
+     * }
+     * ```
+     * @param key 
+     * @param obj 
+     */
+    export function hasProperty<K extends UniqueKeys<T>, T extends object>(
+        obj: T,
+        key: K
+    ): obj is FilterByKnownKey<T, K> {
+        return key in obj;
+    }
 
 
 

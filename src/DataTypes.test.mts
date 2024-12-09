@@ -394,3 +394,31 @@ test('checkIfValueExistsInEnum', () => {
 //     expect(DataTypes.isIterableObject(new Date())).toBeFalsy()
 // })
 
+
+
+test('hasProperty', () => {
+    type TypeA = {a:string}
+    type TypeB = {b:string}
+
+    function func(param1:TypeA|TypeB){
+        if('c' in param1){ // no compilation error
+            //...
+            return 'c'
+        }    
+
+        if(DataTypes.hasProperty(param1, 'a')){ 
+            //...
+            return 'a'
+        }
+        return undefined
+    }
+
+    expect(func({a:'a', b:'b'})).toEqual('a')
+    // expect(func({a:'a', b:'b', c:'c'})).toEqual('c')
+
+    const x = {a:'a', b:'b'}
+    expect(DataTypes.hasProperty(x, 'a')).toBeTruthy()
+    expect(DataTypes.hasProperty(x, 'b')).toBeTruthy()
+    // expect(DataTypes.hasProperty(x, 'c')).toBeFalsy()
+})
+

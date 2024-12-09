@@ -420,3 +420,27 @@ DataTypes.isValueExistsInEnum(1, EnumForTestNumber) // true
 DataTypes.isValueExistsInEnum(100, EnumForTestNumber) // false
 DataTypes.isValueExistsInEnum(undefined, EnumForTestNumber) // false
 ```
+
+<br/>
+<br/>
+
+
+### DataTypes.hasProperty(obj: T, key: string): boolean
+
+Type-safe check if object has property
+
+```typescript
+type TypeA = {a:string}
+type TypeB = {b:string}
+
+function func(param1:TypeA|TypeB){
+    if('c' in param1){ // no compilation error
+        //...
+    }    
+
+    if(DataTypes.hasProperty(param1, 'c')){ // compilation error 
+        //...
+    }
+}
+```
+
