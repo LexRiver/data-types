@@ -438,11 +438,17 @@ test('JsonCompatible', () => {
         console.log(JSON.stringify(x))
     }
 
+    function expectingAnyJsonValue(x:any){
+        console.log(JSON.stringify(x))
+    }
+
     expectingJsonCompatible(5)
     expectingJsonType(5) 
+    expectingAnyJsonValue(5)
 
     expectingJsonCompatible({a:'a1'})
     expectingJsonType({a:'a1'})
+    expectingAnyJsonValue({a:'a1'})
 
 
 
@@ -450,6 +456,7 @@ test('JsonCompatible', () => {
     let safe = {a:'a1', b:5}
     expectingJsonCompatible(safe)
     expectingJsonType(safe)
+    expectingAnyJsonValue(safe)
 
 
     let unsafe = {
@@ -458,6 +465,7 @@ test('JsonCompatible', () => {
     }
     expectingJsonCompatible(unsafe) // compile error
     expectingJsonType(unsafe) // compile error
+    expectingAnyJsonValue(unsafe) // no error
 
     type SafeJsonType = {a:string, b:number}
     type NonSafeJsonType = {a:string, f: (x:string)=>void}
@@ -467,16 +475,25 @@ test('JsonCompatible', () => {
 
     expectingJsonCompatible(safe2)
     expectingJsonCompatible(unsafe2) // compile error
+
     expectingJsonType(safe2)
     expectingJsonType(unsafe2) // compile error
+
+    expectingAnyJsonValue(safe2) 
+    expectingAnyJsonValue(unsafe2) // no error
+    
 
     let safe3 = {a: {b:'b1'}}
     let unsafe3 = {a: {b:'b1', f: (x:string)=>{console.log(x)}}}
 
     expectingJsonCompatible(safe3)
     expectingJsonCompatible(unsafe3) // compile error
+
     expectingJsonType(safe3)
     expectingJsonType(unsafe3) // compile error
+
+    expectingAnyJsonValue(safe3)
+    expectingAnyJsonValue(unsafe3) // no error
 
     let safe4 = {a:{b:{c:'c1'}}}
     let unsafe4 = {a:{b:{c:'c1', f: (x:string)=>{console.log(x)}}}}
