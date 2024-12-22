@@ -353,46 +353,6 @@ __Example__
 */    
 ```
 
-<br/>
-<br/>
-
-### DataTypes.isValidJsonObject(json: any)
-
-Check if no instances of classes in object
-
-```typescript
-    const x = {
-        a: 'a',
-        b: 'b',
-        c: {
-            c1:'c1',
-            c2: 23234,
-            c3: new Date()
-        },
-        d:[
-            'd1', 'd2', 'd3'
-        ]
-    }
-    DataTypes.isValidJsonObject(x) // true
-```
-
-```typescript
-    class MyClass{
-        constructor(public a:string){
-        }
-    }
-
-    const x = new MyClass('x')
-
-    DataTypes.isValidJsonObject({a:x}) // false
-```
-
-<br/>
-<br/>
-
-### DataTypes.toJson(o:any)
-
-Convert any object to valid json object
 
 <br/>
 <br/>
@@ -444,3 +404,98 @@ function func(param1:TypeA|TypeB){
 }
 ```
 
+<br/>
+<br/>
+
+### type AnyJsonValue
+
+Represents any json value
+
+```typescript
+export type AnyJsonValue =
+    | string
+    | number
+    | boolean
+    | null
+    | Date
+    | { readonly [K in string]: AnyJsonValue }
+    | Array<AnyJsonValue>
+    | undefined
+```
+
+
+<br/>
+<br/>
+
+### DataTypes.isValidJsonObject(json: any):json is AnyJsonValue
+
+Check if parameter is valid json object
+
+```typescript
+    const x = {
+        a: 'a',
+        b: 'b',
+        c: {
+            c1:'c1',
+            c2: 23234,
+            c3: new Date()
+        },
+        d:[
+            'd1', 'd2', 'd3'
+        ]
+    }
+    DataTypes.isValidJsonObject(x) // true
+```
+
+```typescript
+    class MyClass{
+        constructor(public a:string){
+        }
+    }
+
+    const x = new MyClass('x')
+
+    DataTypes.isValidJsonObject({a:x}) // false
+```
+
+<br/>
+<br/>
+
+### DataTypes.toJson(o:any)
+
+Convert any object to valid json object via JSON.parse(JSON.stringify(o))
+
+<br/>
+<br/>
+
+### type JsonType<T>
+
+Represents JSON type to use as parameter for function
+
+__Example__
+```typescript
+function expectingSomeJson<T>(x:JsonType<T>){
+    // here we can be sure that parameter is valid json object
+    return JSON.stringify(json) // or save to database, etc
+}
+
+type Person = {
+    name:string
+}
+type NonJsonType = {
+    fn: ()=>void
+}
+
+const person:Person = {
+    name: 'John'
+}
+
+expectingSomeJson(person) // ok
+
+const nonJson:NonJsonType = {
+    fn: ()=>{}
+}
+
+expectingSomeJson(nonJson) // compilation error
+
+```

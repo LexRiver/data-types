@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest'
 import { DataTypes } from "./DataTypes.mjs"
+import { JsonCompatible, JsonType } from './Types.mjs'
 
 
 test('isValidJsonObject', () => {
@@ -27,6 +28,11 @@ test('isValidJsonObject: class instances should fail', () => {
     const x = new MyClass('x')
 
     expect(DataTypes.isValidJsonObject({a:x})).toBe(false)
+
+    if(DataTypes.isValidJsonObject(x)){
+        const y = x
+        console.log('y.a=', y.a)
+    }
 })
 
 test('isValidJsonObject: Map', () => {
@@ -420,5 +426,209 @@ test('hasProperty', () => {
     expect(DataTypes.hasProperty(x, 'a')).toBeTruthy()
     expect(DataTypes.hasProperty(x, 'b')).toBeTruthy()
     // expect(DataTypes.hasProperty(x, 'c')).toBeFalsy()
+})
+
+test('JsonCompatible', () => {
+
+    function expectingJsonCompatible<T extends JsonCompatible<T>>(data: T){
+        console.log(JSON.stringify(data))
+    }
+
+    function expectingJsonType<T>(x:JsonType<T>){
+        console.log(JSON.stringify(x))
+    }
+
+    expectingJsonCompatible(5)
+    expectingJsonType(5) 
+
+    expectingJsonCompatible({a:'a1'})
+    expectingJsonType({a:'a1'})
+
+
+
+    
+    let safe = {a:'a1', b:5}
+    expectingJsonCompatible(safe)
+    expectingJsonType(safe)
+
+
+    let unsafe = {
+        a:'a1',
+        f: (x:string)=>{console.log(x)}
+    }
+    expectingJsonCompatible(unsafe) // compile error
+    expectingJsonType(unsafe) // compile error
+
+    type SafeJsonType = {a:string, b:number}
+    type NonSafeJsonType = {a:string, f: (x:string)=>void}
+
+    let unsafe2:NonSafeJsonType = {a:'a1', f: (x:string)=>{console.log(x)}}
+    let safe2:SafeJsonType = {a:'a1', b:5}
+
+    expectingJsonCompatible(safe2)
+    expectingJsonCompatible(unsafe2) // compile error
+    expectingJsonType(safe2)
+    expectingJsonType(unsafe2) // compile error
+
+    let safe3 = {a: {b:'b1'}}
+    let unsafe3 = {a: {b:'b1', f: (x:string)=>{console.log(x)}}}
+
+    expectingJsonCompatible(safe3)
+    expectingJsonCompatible(unsafe3) // compile error
+    expectingJsonType(safe3)
+    expectingJsonType(unsafe3) // compile error
+
+    let safe4 = {a:{b:{c:'c1'}}}
+    let unsafe4 = {a:{b:{c:'c1', f: (x:string)=>{console.log(x)}}}}
+
+    expectingJsonCompatible(safe4)
+    expectingJsonCompatible(unsafe4) // compile error
+    expectingJsonType(safe4)
+    expectingJsonType(unsafe4) // compile error
+
+    let unsafe5 = {a:BigInt(0)}
+
+    expectingJsonCompatible(unsafe5) // compile error
+    expectingJsonType(unsafe5) // compile error
+
+    type NonSafeType2 = {
+        a:string,
+        b:{
+            c:Date,
+            f:()=>void
+        }
+    }
+
+    let unsafe6:NonSafeType2 = {
+        a:'a1',
+        b:{
+            c:new Date(),
+            f:()=>{}
+        }
+    }
+
+    expectingJsonCompatible(unsafe6) // compile error
+    expectingJsonType(unsafe6) // compile error
+
+    type Test1 = JsonCompatible<string>
+    let test1:Test1 = 'a1'
+    type Test1D = JsonType<string>
+    let test1d:Test1D = 'a1'
+    
+
+    type Test2 = JsonCompatible<{a:string, b:number}>
+    let test2:Test2 = {a:'a1', b:5}
+    type Test2D = JsonType<{a:string, b:number}>
+    let test2d:Test2D = {a:'a1', b:5}
+
+    type Test3 = JsonCompatible<{a:string, b:number, f:()=>void}> 
+    let test3:Test3 = {a:'a1', b:5, f:()=>{}} //compile error
+
+    type Test3D = JsonType<{a:string, b:number, f:()=>void}>
+    let test3d:Test3D = {a:'a1', b:5, f:()=>{}} // compile error
+
+    type Test4 = JsonCompatible<{a:string, b:BigInt}>
+    let test4:Test4 = {a:'a1', b:BigInt(10)} // compile error
+    type Test4D = JsonType<{a:string, b:BigInt}>
+    let test4d:Test4D = {a:'a1', b:BigInt(10)} // compile error
+
+    type Test5 = JsonCompatible<{a:string, b:{c:string}}>
+    let test5:Test5 = {a:'a1', b:{c:'c1'}}
+    type Test5D = JsonType<{a:string, b:{c:string}}>
+    let test5d:Test5D = {a:'a1', b:{c:'c1'}}
+
+    type Test6 = JsonCompatible<{a:string, b:{c:string, f:()=>void, d:Date, e:BigInt}}>
+    let test6:Test6 = {a:'a1', b:{c:'c1', f:()=>{}, d:new Date(), e:BigInt(10)}} // compile error
+    type Test6D = JsonType<{a:string, b:{c:string, f:()=>void, d:Date, e:BigInt}}>
+    let test6d:Test6D = {a:'a1', b:{c:'c1', f:()=>{}, d:new Date(), e:BigInt(10)}} // compile error
+
+    type Test7 = JsonCompatible<{a:string, b:{c:string, f:()=>void, d:Date, e:BigInt, g:Map<string, number>}}>
+    let test7:Test7 = {a:'a1', b:{c:'c1', f:()=>{}, d:new Date(), e:BigInt(10), g:new Map()}} // compile error
+    type Test7D = JsonType<{a:string, b:{c:string, f:()=>void, d:Date, e:BigInt, g:Map<string, number>}}>
+    let test7d:Test7D = {a:'a1', b:{c:'c1', f:()=>{}, d:new Date(), e:BigInt(10), g:new Map()}} // compile error
+
+    class MyClass1{
+        constructor(public a:string){
+        }
+    }
+    
+
+    type Test8 = JsonCompatible<{a:string, b:MyClass1}>
+    let test8:Test8 = {a:'a1', b:new MyClass1('a')}
+    type Test8D = JsonType<{a:string, b:MyClass1}>
+    let test8d:Test8D = {a:'a1', b:new MyClass1('a')} // compile error
+
+    class MyClass2{
+        constructor(public a:string, public f:()=>void){
+        }
+    }
+
+    type Test9 = JsonCompatible<{a:string, b:MyClass2}>
+    let test9:Test9 = {a:'a1', b:new MyClass2('a', ()=>{})} // compile error
+
+    type Test9D = JsonType<{a:string, b:MyClass2}>
+    let test9d:Test9D = {a:'a1', b:new MyClass2('a', ()=>{})} // compile error
+
+    expectingJsonCompatible(new Date()) // compile error (!)
+    expectingJsonType(new Date())
+
+    expectingJsonCompatible(new Map()) // compile error
+    expectingJsonType(new Map()) // compile error
+
+    expectingJsonCompatible(new Set())  // compile error
+    expectingJsonType(new Set()) // compile error
+
+    expectingJsonCompatible(new WeakMap()) // compile error
+    expectingJsonType(new WeakMap()) // compile error
+
+    expectingJsonCompatible(new WeakSet()) // compile error
+    expectingJsonType(new WeakSet()) // compile error
+
+    expectingJsonCompatible(new ArrayBuffer(10)) // compile error
+    expectingJsonType(new ArrayBuffer(10)) // compile error
+
+    expectingJsonCompatible(new Int8Array(10)) // compile error
+    expectingJsonType(new Int8Array(10)) // compile error
+
+    expectingJsonCompatible(new Uint8Array(10)) // compile error
+    expectingJsonType(new Uint8Array(10)) // compile error
+
+    expectingJsonCompatible(new ArrayBuffer(10)) // compile error
+    expectingJsonType(new ArrayBuffer(10)) // compile error
+
+
+    
+})
+
+test('toAnyJsonValue', () => {
+    let r1 = DataTypes.toJsonCompatible(5)
+    let r1d = DataTypes.toAnyJsonValue(5)
+    let r2 = DataTypes.toJsonCompatible('a')
+    let r2d = DataTypes.toAnyJsonValue('a')
+    let r3 = DataTypes.toJsonCompatible(new Date())
+    let r3d = DataTypes.toAnyJsonValue(new Date())
+    let r4 = DataTypes.toJsonCompatible(new Map())
+    let r4d = DataTypes.toAnyJsonValue(new Map())
+    let r5 = DataTypes.toJsonCompatible(new Set())
+    let r5d = DataTypes.toAnyJsonValue(new Set())
+    let r6 = DataTypes.toJsonCompatible(new WeakMap())
+    let r6d = DataTypes.toAnyJsonValue(new WeakMap())
+    let r7 = DataTypes.toJsonCompatible(new WeakSet())
+    let r7d = DataTypes.toAnyJsonValue(new WeakSet())
+    let r8 = DataTypes.toJsonCompatible(new ArrayBuffer(10))
+    let r8d = DataTypes.toAnyJsonValue(new ArrayBuffer(10))
+    let r9 = DataTypes.toJsonCompatible(new ArrayBuffer(10))
+    let r9d = DataTypes.toAnyJsonValue(new ArrayBuffer(10))
+    let r10 = DataTypes.toJsonCompatible(new Int8Array(10))
+    let r10d = DataTypes.toAnyJsonValue(new Int8Array(10))
+    let r11 = DataTypes.toJsonCompatible(new Uint8Array(10))
+    let r11d = DataTypes.toAnyJsonValue(new Uint8Array(10))
+    let r12 = DataTypes.toJsonCompatible(new Uint8ClampedArray(10))
+    let r12d = DataTypes.toAnyJsonValue(new Uint8ClampedArray(10))
+    let r13 = DataTypes.toJsonCompatible({a:'a', b:'b'})
+    let r13d = DataTypes.toAnyJsonValue({a:'a', b:'b'})
+    let r14 = DataTypes.toJsonCompatible({a:'a', b:()=>{}})
+    let r14d = DataTypes.toAnyJsonValue({a:'a', b:()=>{}})
+
 })
 

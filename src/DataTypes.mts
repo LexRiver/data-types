@@ -1,4 +1,4 @@
-import { FilterByKnownKey, UniqueKeys } from "./Types.mjs";
+import { AnyJsonValue, FilterByKnownKey, JsonCompatible, JsonType, UniqueKeys } from "./Types.mjs";
 
 export namespace DataTypes {
     export function isFunction(x: any):boolean {
@@ -229,7 +229,7 @@ export namespace DataTypes {
      * Check if no instances of classes in object
      * @param json 
      */
-    export function isValidJsonObject(json: any) {
+    export function isValidJsonObject(json: any):json is AnyJsonValue {
         if (json === null || json === undefined) return true
         const typeName = json.constructor.name
         switch (typeName) {
@@ -299,7 +299,13 @@ export namespace DataTypes {
 
 
 
+    export function toJsonCompatible<T extends JsonCompatible<T>>(value: T): AnyJsonValue {
+        return value;
+    }
 
+    export function toAnyJsonValue<T>(value: JsonType<T>): AnyJsonValue {
+        return value;
+    }
 
 
 }
