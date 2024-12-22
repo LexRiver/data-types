@@ -468,13 +468,13 @@ Convert any object to valid json object via JSON.parse(JSON.stringify(o))
 <br/>
 <br/>
 
-### type JsonType<T>
+### type JsonType\<T\>
 
 Represents JSON type to use as parameter for function
 
 __Example__
 ```typescript
-function expectingSomeJson<T>(x:JsonType<T>){
+function expectingJsonType<T>(x:JsonType<T>){
     // here we can be sure that parameter is valid json object
     return JSON.stringify(json) // or save to database, etc
 }
@@ -490,12 +490,41 @@ const person:Person = {
     name: 'John'
 }
 
-expectingSomeJson(person) // ok
+expectingJsonType(person) // ok
 
 const nonJson:NonJsonType = {
     fn: ()=>{}
 }
 
-expectingSomeJson(nonJson) // compilation error
+expectingJsonType(nonJson) // compilation error
 
 ```
+
+### type JsonCompatible\<T\>
+
+Type `JsonCompatible` is a type that can be safely converted to JSON. This type sometimes works better than `JsonType<T>`, for example with interfaces.
+
+```typescript
+
+    function expectingJsonCompatible<T extends JsonCompatible<T>>(data: T){
+        console.log(JSON.stringify(data))
+    }
+
+    interface User {
+        name:string
+    }
+    let user:User = {name:'a'}
+    expectingJsonCompatible(user)
+    expectingJsonType(user) // compile error (!)
+
+    interface UserNonJson {
+        name:string
+        fn:()=>void
+    }
+    let userNonJson:UserNonJson = {name:'a', fn:()=>{}}
+    expectingJsonCompatible(userNonJson) // compile error
+    expectingJsonType(userNonJson) // compile error
+
+
+```
+

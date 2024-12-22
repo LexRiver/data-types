@@ -596,6 +596,21 @@ test('JsonCompatible', () => {
     expectingJsonCompatible(new ArrayBuffer(10)) // compile error
     expectingJsonType(new ArrayBuffer(10)) // compile error
 
+    interface User {
+        name:string
+    }
+    let user:User = {name:'a'}
+    expectingJsonCompatible(user)
+    expectingJsonType(user) // compile error (!)
+
+    interface UserNonJson {
+        name:string
+        fn:()=>void
+    }
+    let userNonJson:UserNonJson = {name:'a', fn:()=>{}}
+    expectingJsonCompatible(userNonJson) // compile error
+    expectingJsonType(userNonJson) // compile error
+
 
     
 })
