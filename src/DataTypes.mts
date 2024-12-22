@@ -1,5 +1,7 @@
 import { AnyJsonValue, FilterByKnownKey, JsonCompatible, JsonType, UniqueKeys } from "./Types.mjs";
 
+export * from './Types.mjs';
+
 export namespace DataTypes {
     export function isFunction(x: any):boolean {
         return typeof x === 'function'
