@@ -691,6 +691,17 @@ test('hasDefinedProperty - property exists and is defined', () => {
     func({a:'a', b:5})
 })
 
+test('hasDefinedProperty - array', () => {
+    type TypeA = {a:string, b?:string[]}
+    const x:TypeA = {a:'a', b:['b1', 'b2']}
+    if(DataTypes.hasDefinedProperty(x, 'b')){
+        x.b.forEach(value=>expect(value.length).toBe(2))
+    }
+    expect(DataTypes.hasDefinedProperty(x, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(x, 'b')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(x, 'c')).toBe(false)
+})
+
 test('hasDefinedProperty - property exists but is undefined', () => {
     const obj = {a: 'test', b: undefined}
     

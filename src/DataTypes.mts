@@ -1,4 +1,4 @@
-import { AnyJsonValue, FilterByKnownKey, JsonCompatible, JsonType, UniqueKeys } from "./Types.mjs";
+import { AnyJsonValue, FilterByDefinedKey, FilterByKnownKey, JsonCompatible, JsonType, UniqueKeys } from "./Types.mjs";
 
 export * from './Types.mjs';
 
@@ -302,14 +302,14 @@ export namespace DataTypes {
     export function hasDefinedProperty<K extends UniqueKeys<T>, T extends object>(
         obj: T,
         key: K
-    ): obj is FilterByKnownKey<T, K> {
+    ): obj is FilterByDefinedKey<T, K> {
         return key in obj && obj[key] !== undefined;
     }
 
     export function hasDefinedPropertyAndValue<K extends UniqueKeys<T>, T extends object>(
         obj: T,
         key: K
-    ): obj is FilterByKnownKey<T, K> {
+    ): obj is FilterByDefinedKey<T, K> {
         return key in obj && obj[key] !== undefined && obj[key] !== null;
     }
 
