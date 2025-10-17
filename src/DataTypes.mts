@@ -299,6 +299,20 @@ export namespace DataTypes {
         return key in obj;
     }
 
+    export function hasDefinedProperty<K extends UniqueKeys<T>, T extends object>(
+        obj: T,
+        key: K
+    ): obj is FilterByKnownKey<T, K> {
+        return key in obj && obj[key] !== undefined;
+    }
+
+    export function hasDefinedPropertyAndValue<K extends UniqueKeys<T>, T extends object>(
+        obj: T,
+        key: K
+    ): obj is FilterByKnownKey<T, K> {
+        return key in obj && obj[key] !== undefined && obj[key] !== null;
+    }
+
 
 
     export function toJsonCompatible<T extends JsonCompatible<T>>(value: T): AnyJsonValue {

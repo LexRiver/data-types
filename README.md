@@ -407,6 +407,95 @@ function func(param1:TypeA|TypeB){
 <br/>
 <br/>
 
+### DataTypes.hasDefinedProperty(obj: T, key: K): boolean
+
+Type-safe check if object has property and the property value is not `undefined`. This function performs type narrowing and returns `true` if the property exists and is not `undefined`. Note that `null` values will return `true`.
+
+__Parameters__
+* `obj: T` - object to check
+* `key: K` - property key to check (must be a valid key of the union type)
+
+__Returns__
+* `boolean` - `true` if property exists and is not `undefined`, `false` otherwise
+
+__Examples__
+
+```typescript
+type TypeA = {a: string, b?: number}
+type TypeB = {c: string}
+
+const obj: TypeA | TypeB = {a: 'test', b: 42}
+
+if (DataTypes.hasDefinedProperty(obj, 'a')) {
+    // TypeScript knows obj has property 'a' here
+    console.log(obj.a) // OK
+}
+
+```
+
+```typescript
+const obj = {a: 'test', b: undefined, c: null}
+
+DataTypes.hasDefinedProperty(obj, 'a') // true
+DataTypes.hasDefinedProperty(obj, 'b') // false (undefined)
+DataTypes.hasDefinedProperty(obj, 'c') // true (null is not undefined)
+```
+
+```typescript
+const obj = {a: 0, b: '', c: false}
+
+DataTypes.hasDefinedProperty(obj, 'a') // true (0 is defined)
+DataTypes.hasDefinedProperty(obj, 'b') // true (empty string is defined)
+DataTypes.hasDefinedProperty(obj, 'c') // true (false is defined)
+```
+
+<br/>
+<br/>
+
+### DataTypes.hasDefinedPropertyAndValue(obj: T, key: K): boolean
+
+Type-safe check if object has property and the property value is not `undefined` and not `null`. This is stricter than `hasDefinedProperty` as it also excludes `null` values.
+
+__Parameters__
+* `obj: T` - object to check
+* `key: K` - property key to check (must be a valid key of the union type)
+
+__Returns__
+* `boolean` - `true` if property exists and is neither `undefined` nor `null`, `false` otherwise
+
+__Examples__
+
+```typescript
+type TypeA = {a: string, b?: number | null}
+type TypeB = {c: string}
+
+const obj: TypeA | TypeB = {a: 'test', b: 42}
+
+if (DataTypes.hasDefinedPropertyAndValue(obj, 'a')) {
+    // TypeScript knows obj has property 'a' with a value here
+    console.log(obj.a) // OK
+}
+```
+
+```typescript
+const obj = {a: 'test', b: undefined, c: null}
+
+DataTypes.hasDefinedPropertyAndValue(obj, 'a') // true
+DataTypes.hasDefinedPropertyAndValue(obj, 'b') // false (undefined)
+DataTypes.hasDefinedPropertyAndValue(obj, 'c') // false (null)
+```
+
+```typescript
+const obj = {a: 0, b: '', c: false}
+
+DataTypes.hasDefinedPropertyAndValue(obj, 'a') // true (0 is a value)
+DataTypes.hasDefinedPropertyAndValue(obj, 'b') // true (empty string is a value)
+DataTypes.hasDefinedPropertyAndValue(obj, 'c') // true (false is a value)
+```
+
+<br/>
+<br/>
+
 ### type AnyJsonValue
 
 Represents any json value

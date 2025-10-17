@@ -664,3 +664,126 @@ test('toAnyJsonValue', () => {
 
 })
 
+test('hasDefinedProperty - property exists and is defined', () => {
+    type TypeA = {a: string, b?: number}
+    type TypeB = {c: string}
+    
+    function func(p: TypeA | TypeB) {
+        if (DataTypes.hasDefinedProperty(p, 'a')) {
+            // Type narrowing should work here
+            expect(p.a).toBe('a')
+
+        } 
+        
+        if(DataTypes.hasDefinedProperty(p, 'c')){
+            expect(p.c).toBe('c')
+
+        } 
+        
+        if(DataTypes.hasDefinedProperty(p, 'b')){
+            expect(p.b).toBe(5)
+        } 
+            
+    }
+
+    func({a:'a'})
+    func({c:'c'})
+    func({a:'a', b:5})
+})
+
+test('hasDefinedProperty - property exists but is undefined', () => {
+    const obj = {a: 'test', b: undefined}
+    
+    expect(DataTypes.hasDefinedProperty(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(obj, 'b')).toBe(false)
+})
+
+test('hasDefinedProperty - property does not exist', () => {
+    type TypeA = {a: string}
+    type TypeB = {b: string}
+    
+    const obj: TypeA | TypeB = {a: 'test'}
+    
+    expect(DataTypes.hasDefinedProperty(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(obj, 'b')).toBe(false)
+})
+
+test('hasDefinedProperty - property with null value', () => {
+    const obj = {a: 'test', b: null}
+    
+    expect(DataTypes.hasDefinedProperty(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(obj, 'b')).toBe(true) // null is not undefined
+})
+
+test('hasDefinedProperty - property with falsy values', () => {
+    const obj = {a: 0, b: '', c: false, d: undefined}
+    
+    expect(DataTypes.hasDefinedProperty(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(obj, 'b')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(obj, 'c')).toBe(true)
+    expect(DataTypes.hasDefinedProperty(obj, 'd')).toBe(false)
+})
+
+test('hasDefinedPropertyAndValue - property exists with defined non-null value', () => {
+    type TypeA = {a: string, b?: number | null}
+    type TypeB = {c: string}
+    
+    const obj1: TypeA | TypeB = {a: 'test', b: 42}
+    
+    if (DataTypes.hasDefinedPropertyAndValue(obj1, 'a')) {
+        expect(obj1.a).toBe('test')
+    } else {
+        throw new Error('Should have property a with value')
+    }
+})
+
+test('hasDefinedPropertyAndValue - property exists but is undefined', () => {
+    const obj = {a: 'test', b: undefined}
+    
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'b')).toBe(false)
+})
+
+test('hasDefinedPropertyAndValue - property exists but is null', () => {
+    const obj = {a: 'test', b: null}
+    
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'b')).toBe(false)
+})
+
+test('hasDefinedPropertyAndValue - property does not exist', () => {
+    type TypeA = {a: string}
+    type TypeB = {b: string}
+    
+    const obj: TypeA | TypeB = {a: 'test'}
+    
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'b')).toBe(false)
+})
+
+test('hasDefinedPropertyAndValue - property with falsy values', () => {
+    const obj = {a: 0, b: '', c: false, d: undefined, e: null}
+    
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'a')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'b')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'c')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'd')).toBe(false)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'e')).toBe(false)
+})
+
+test('hasDefinedPropertyAndValue - complex object', () => {
+    const obj = {
+        name: 'John',
+        age: 30,
+        address: null,
+        phone: undefined,
+        active: true
+    }
+    
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'name')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'age')).toBe(true)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'address')).toBe(false)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'phone')).toBe(false)
+    expect(DataTypes.hasDefinedPropertyAndValue(obj, 'active')).toBe(true)
+})
+
