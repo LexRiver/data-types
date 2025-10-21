@@ -645,6 +645,90 @@ __Use cases__
 <br/>
 <br/>
 
+### type SomeOptional<T, K extends keyof T>
+
+Alias for `PartiallyPartial<T, K>`. Make selected fields optional while keeping the rest of the object unchanged.
+
+```typescript
+type User = {
+    id: string
+    email: string
+    username: string
+}
+
+type UserWithSomeOptional = SomeOptional<User, 'email' | 'username'>
+/*
+    Equivalent to:
+    {
+        id: string;              // unchanged (still required)
+        email?: string | undefined;
+        username?: string | undefined;
+    }
+*/
+```
+
+__Use cases__
+* Optionalizing only the fields you pass in (e.g., partial updates, patch payloads).
+
+<br/>
+<br/>
+
+### type PartialExcept<T, K extends keyof T>
+
+Make all fields optional except a specified subset which remain required.
+
+```typescript
+type User = {
+    id: string
+    email?: string
+    username?: string
+}
+
+type Payload = PartialExcept<User, 'id'>
+/*
+    Equivalent to:
+    {
+        id: string;              // required
+        email?: string | undefined;
+        username?: string | undefined;
+    }
+*/
+```
+
+__Use cases__
+* Defining payloads where an identifier must be present but other fields are optional.
+
+<br/>
+<br/>
+
+### type SomeRequired<T, K extends keyof T>
+
+Alias for `PartialExcept<T, K>`. Make all fields optional except the specified keys, which are required.
+
+```typescript
+type User = {
+    id: string
+    email?: string
+    username?: string
+}
+
+type Payload2 = SomeRequired<User, 'id' | 'email'>
+/*
+    Equivalent to:
+    {
+        id: string;              // required
+        email: string;           // required
+        username?: string | undefined;
+    }
+*/
+```
+
+__Use cases__
+* Ensuring certain fields are present while relaxing the rest.
+
+<br/>
+<br/>
+
 ### type AtLeastOne<T, K extends keyof T>
 
 Require that at least one of the specified keys is present. Useful for filters or input where multiple alternative identifiers are allowed.
