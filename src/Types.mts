@@ -40,5 +40,27 @@ export type JsonType<T> = T extends AnyJsonValue ? T : never;
 
 
 
+/**
+ * Make some fields of an object optional, but keep the rest of the object as is.
+ * 
+ * use like this:
+ * 
+ * PartiallyPartial<JsonLink, 'href'>
+ * 
+ * or
+ * 
+ * PartiallyPartial<JsonUser, 'password'>
+ * 
+ * 
+ */
+export type PartiallyPartial<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
+
+/**
+ * use like this: 
+ * AtLeastOne<JsonUser, 'emailLowered' | 'id'>
+ */
+export type AtLeastOne<T, K extends keyof T> =
+  K extends any ? Required<Pick<T, K>> & Partial<Omit<T, K>> : never;
 
 

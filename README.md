@@ -617,3 +617,55 @@ Type `JsonCompatible` is a type that can be safely converted to JSON. This type 
 
 ```
 
+### type PartiallyPartial<T, K extends keyof T>
+
+Make selected fields optional while keeping all other fields unchanged.
+
+```typescript
+type User = {
+    id: string
+    email: string
+    password: string
+}
+
+type UserWithOptionalEmailAndPassword = PartiallyPartial<User, 'email' | 'password'>
+/*
+    Equivalent to:
+    {
+        id: string;              // unchanged (still required)
+        email?: string | undefined;
+        password?: string | undefined;
+    }
+*/
+```
+
+__Use cases__
+* Making a subset of fields optional in update payloads while keeping identifiers required.
+
+<br/>
+<br/>
+
+### type AtLeastOne<T, K extends keyof T>
+
+Require that at least one of the specified keys is present. Useful for filters or input where multiple alternative identifiers are allowed.
+
+```typescript
+type User = {
+    id: string
+    email: string
+    username: string
+}
+
+type UserLookup = AtLeastOne<User, 'id' | 'email' | 'username'>
+
+function findUser(query: UserLookup){
+    // query must contain at least one of: id, email, username
+}
+
+findUser({ id: '123' }) // OK
+findUser({ email: 'a@b.com' }) // OK
+findUser({}) // compile error
+```
+
+__Notes__
+* Other non-listed fields are optional in the resulting type, but at least one of `K` must be present.
