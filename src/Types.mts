@@ -83,8 +83,6 @@ export type PartialExcept<T, K extends keyof T> = Required<Pick<T, K>> & Partial
 export type SomeRequired<T, K extends keyof T> = PartialExcept<T, K>;
 
 
-
-
 /**
  * Make at least one field required and all other fields optional.
  * 
@@ -92,7 +90,6 @@ export type SomeRequired<T, K extends keyof T> = PartialExcept<T, K>;
  * AtLeastOne<JsonUser, 'emailLowered'>
  * AtLeastOne<JsonUser, 'emailLowered' | 'id'>
  */
-export type AtLeastOne<T, K extends keyof T> =
-  K extends any ? Required<Pick<T, K>> & Partial<Omit<T, K>> : never;
+export type AtLeastOne<T, K extends keyof T> = K extends any ? Required<Pick<T, K>> & Partial<Omit<T, K>> : never;
 
 
