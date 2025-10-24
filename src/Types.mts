@@ -49,7 +49,7 @@ export type JsonType<T> = T extends AnyJsonValue ? T : never;
  * 
  * Alias for SomeOptional<T, K>
  */
-export type PartiallyPartial<T, K extends PropertyKey> =
+export type PartiallyPartial<T, K extends keyof T> =
   T extends unknown
     ? Pick<Partial<T>, Extract<K, keyof T>> & Omit<T, Extract<K, keyof T>>
     : never;
@@ -62,7 +62,7 @@ export type PartiallyPartial<T, K extends PropertyKey> =
  * 
  * Alias for PartiallyPartial<T, K>
  */
-export type SomeOptional<T, K extends PropertyKey> = PartiallyPartial<T, K>;
+export type SomeOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
 
 /**
  * Make all fields optional except a specified subset required.
@@ -73,7 +73,7 @@ export type SomeOptional<T, K extends PropertyKey> = PartiallyPartial<T, K>;
  * 
  * Alias for SomeRequired<T, K>
  */
-export type PartialExcept<T, K extends PropertyKey> =
+export type PartialExcept<T, K extends keyof T> =
   T extends unknown
     ? Required<Pick<T, Extract<K, keyof T>>> & Partial<Omit<T, Extract<K, keyof T>>>
     : never;
@@ -86,7 +86,7 @@ export type PartialExcept<T, K extends PropertyKey> =
  * 
  * Alias for PartialExcept<T, K>
  */
-export type SomeRequired<T, K extends PropertyKey> = PartialExcept<T, K>;
+export type SomeRequired<T, K extends keyof T> = PartialExcept<T, K>;
 
 
 /**
@@ -96,7 +96,7 @@ export type SomeRequired<T, K extends PropertyKey> = PartialExcept<T, K>;
  * AtLeastOne<JsonUser, 'emailLowered'>
  * AtLeastOne<JsonUser, 'emailLowered' | 'id'>
  */
-export type AtLeastOne<T, K extends PropertyKey> =
+export type AtLeastOne<T, K extends keyof T> =
   T extends unknown
     ? [Extract<K, keyof T>] extends [never]
       ? never
