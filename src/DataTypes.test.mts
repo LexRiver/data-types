@@ -874,7 +874,9 @@ test('hasDefinedPropertyAndValue - union excludes null/undefined for key y', () 
     type D1 = { x?: number | null }
     type D2 = { y?: string | null }
 
-    function checkY(u: D1 | D2) {
+    type D3 = {a?:string}
+
+    function checkY(u: D3 & (D1 | D2)) {
         if (DataTypes.hasDefinedPropertyAndValue(u, 'y')) {
             expect(u.y).toBeTypeOf('string')
         } else {
