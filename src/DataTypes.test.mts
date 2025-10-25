@@ -709,14 +709,17 @@ test('hasDefinedProperty - property exists but is undefined', () => {
     expect(DataTypes.hasDefinedProperty(obj, 'b')).toBe(false)
 })
 
-test('hasDefinedProperty - property does not exist', () => {
+test('hasDefinedProperty - property does not exist (union via param)', () => {
     type TypeA = {a: string}
     type TypeB = {b: string}
-    
-    const obj: TypeA | TypeB = {a: 'test'}
-    
-    expect(DataTypes.hasDefinedProperty(obj, 'a')).toBe(true)
-    expect(DataTypes.hasDefinedProperty(obj, 'b')).toBe(false)
+
+    function check(p: TypeA | TypeB) {
+        expect(DataTypes.hasDefinedProperty(p, 'a')).toBe('a' in p)
+        expect(DataTypes.hasDefinedProperty(p, 'b')).toBe('b' in p)
+    }
+
+    check({a: 'test'})
+    check({b: 'test'})
 })
 
 test('hasDefinedProperty - property with null value', () => {
@@ -798,3 +801,88 @@ test('hasDefinedPropertyAndValue - complex object', () => {
     expect(DataTypes.hasDefinedPropertyAndValue(obj, 'active')).toBe(true)
 })
 
+test('hasProperty - union unique keys narrow to member', () => {
+    type A = { a: string }
+    type B = { b: number }
+
+    const values: Array<A | B> = [{ a: 'aa' }, { b: 2 }]
+    values.forEach(v => {
+        if (DataTypes.hasProperty(v, 'a')) {
+            expect(v.a.toUpperCase()).toBe('AA')
+        } else if (DataTypes.hasProperty(v, 'b')) {
+            expect(v.b + 1).toBeGreaterThan(2)
+        } else {
+            throw new Error('unexpected branch')
+        }
+    })
+})
+
+test('hasDefinedProperty - union optional unique keys narrow correctly', () => {
+    type A = { a: string; x?: number }
+    type B = { b: string; y?: number }
+
+    function check(u: A | B) {
+        if (DataTypes.hasDefinedProperty(u, 'x')) {
+            expect(typeof u.x).toBe('number')
+        }
+        if (DataTypes.hasDefinedProperty(u, 'y')) {
+            expect(typeof u.y).toBe('number')
+        }
+    }
+
+    check({ a: 'a', x: 5 })
+    check({ b: 'b', y: 10 })
+    check({ a: 'a' })
+})
+
+test('hasDefinedProperty - union with differing value types on unique keys', () => {
+    type C1 = { x?: number }
+    type C2 = { y?: string }
+
+    function check(u: C1 | C2) {
+        if (DataTypes.hasDefinedProperty(u, 'x')) {
+            expect(typeof u.x === 'number').toBe(true)
+        }
+        if (DataTypes.hasDefinedProperty(u, 'y')) {
+            expect(typeof u.y === 'string').toBe(true)
+        }
+    }
+
+    check({ x: 1 })
+    check({ y: 's' })
+    check({})
+})
+
+test('hasDefinedPropertyAndValue - union excludes null/undefined for key x', () => {
+    type D1 = { x?: number | null }
+    type D2 = { y: string }
+
+    function checkX(u: D1 | D2) {
+        if (DataTypes.hasDefinedPropertyAndValue(u, 'x')) {
+            expect(u.x).toBeTypeOf('number')
+        } else {
+            expect(true).toBe(true)
+        }
+    }
+
+    checkX({ x: null })
+    checkX({ x: 0 })
+    checkX({ y: 'y' })
+})
+
+test('hasDefinedPropertyAndValue - union excludes null/undefined for key y', () => {
+    type D1 = { x?: number | null }
+    type D2 = { y?: string | null }
+
+    function checkY(u: D1 | D2) {
+        if (DataTypes.hasDefinedPropertyAndValue(u, 'y')) {
+            expect(u.y).toBeTypeOf('string')
+        } else {
+            expect(true).toBe(true)
+        }
+    }
+
+    checkY({ y: 'y' })
+    checkY({ y: null })
+    checkY({ x: 1 })
+})

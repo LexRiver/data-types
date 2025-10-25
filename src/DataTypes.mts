@@ -292,24 +292,25 @@ export namespace DataTypes {
      * @param key 
      * @param obj 
      */
-    export function hasProperty<K extends UniqueKeys<T>, T extends object>(
+    export function hasProperty<T extends object, K extends UniqueKeys<T>>(
         obj: T,
         key: K
     ): obj is FilterByKnownKey<T, K> {
         return key in obj;
     }
 
-    export function hasDefinedProperty<K extends UniqueKeys<T>, T extends object>(
+    export function hasDefinedProperty<T extends object, K extends UniqueKeys<T>>(
         obj: T,
         key: K
     ): obj is FilterByDefinedKey<T, K> {
-        return key in obj && obj[key] !== undefined;
+        return key in obj && (obj as any)[key] !== undefined;
     }
 
-    export function hasDefinedPropertyAndValue<K extends UniqueKeys<T>, T extends object>(
+    export function hasDefinedPropertyAndValue<T extends object, K extends UniqueKeys<T>>(
         obj: T,
         key: K
     ): obj is FilterByDefinedKey<T, K> {
+        // return key in obj && (obj as any)[key] !== undefined && (obj as any)[key] !== null;
         return key in obj && obj[key] !== undefined && obj[key] !== null;
     }
 
