@@ -7,7 +7,7 @@
     "exports": "./out/src/DataTypes.mjs",
     "scripts": {
         "test": "vitest",
-        "compile": "tsc",
+        "compile": "tsc -p tsconfig.build.json",
         "clean": "rimraf out",
         "build": "npm run clean && npm run compile"
     },
