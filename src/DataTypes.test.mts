@@ -476,15 +476,15 @@ test('hasProperty', () => {
 test('JsonCompatible', () => {
 
     function expectingJsonCompatible<T extends JsonCompatible<T>>(data: T){
-        console.log(JSON.stringify(data))
+        return data
     }
 
     function expectingJsonType<T>(x:JsonType<T>){
-        console.log(JSON.stringify(x))
+        return x
     }
 
     function expectingAnyJsonValue(x:any){
-        console.log(JSON.stringify(x))
+        return x
     }
 
     expectingJsonCompatible(5)
