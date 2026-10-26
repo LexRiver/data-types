@@ -39,6 +39,17 @@ test('isValidJsonObject: Map', () => {
     expect(DataTypes.isValidJsonObject({a:new Map()})).toBe(false)
 })
 
+test('isValidJsonObject accepts JSON-like dictionaries with unusual prototypes and keys', () => {
+    const nullPrototypeDictionary = Object.assign(Object.create(null), {
+        value: 'value',
+        nested: Object.assign(Object.create(null), {count: 1})
+    })
+    const shadowedConstructor = {constructor: 'dictionary value', enabled: true}
+
+    expect(DataTypes.isValidJsonObject(nullPrototypeDictionary)).toBe(true)
+    expect(DataTypes.isValidJsonObject(shadowedConstructor)).toBe(true)
+})
+
 test('isFunction', () => {
     function myFunction(){
         console.log('myFunction')
@@ -343,6 +354,20 @@ test('isObjectContainsObject (8)', () => {
         ignoreCaseInStringValues: false
     })).toEqual(false)
 
+})
+
+test('isObjectContainsObject safely checks dictionary properties', () => {
+    const nullPrototypeBig = Object.assign(Object.create(null), {value: 'value'})
+    const shadowedHasOwnProperty = {hasOwnProperty: null, value: 'value'} as unknown as Object
+
+    expect(DataTypes.isObjectContainsObject({
+        bigObject: nullPrototypeBig,
+        smallObject: {value: 'value'}
+    })).toBe(true)
+    expect(DataTypes.isObjectContainsObject({
+        bigObject: shadowedHasOwnProperty,
+        smallObject: {value: 'value'}
+    })).toBe(true)
 })
 
 test('isObjectWithKeys (1)', () => {

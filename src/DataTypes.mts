@@ -167,7 +167,7 @@ export namespace DataTypes {
         }
 
         for(let [smallKey, smallValue] of Object.entries(p.smallObject)){
-            if(p.bigObject.hasOwnProperty(smallKey) == false) return false
+            if(Object.prototype.hasOwnProperty.call(p.bigObject, smallKey) == false) return false
             if(isIterableObject(smallValue)){
                 // compare recursievly
                 //console.log('[Data] iterable', smallValue, 'so recursive compare')
@@ -236,28 +236,24 @@ export namespace DataTypes {
      */
     export function isValidJsonObject(json: any):json is AnyJsonValue {
         if (json === null || json === undefined) return true
-        const typeName = json.constructor.name
-        switch (typeName) {
-            case 'Boolean':
-            case 'Number':
-            case 'String':
-            case 'Date':
-                return true
-            case 'Object':
-                //iterate object
-                for (let [k, v] of Object.entries(json)) {
-                    //log.message('k=', k, 'v=', v)
-                    if (isValidJsonObject(v) == false) return false
-                }
-                return true
-            case 'Array':
-                // iterate array
-                for (let v of json) {
-                    if (isValidJsonObject(v) == false) return false
-                }
-                return true
-            default: return false
+        if (typeof json === 'boolean' || typeof json === 'number' || typeof json === 'string') return true
+        const objectType = Object.prototype.toString.call(json)
+        if (objectType === '[object Boolean]' || objectType === '[object Number]' || objectType === '[object String]') return true
+        if (isDate(json)) return true
+        if (isArray(json)) {
+            for (const value of json) {
+                if (isValidJsonObject(value) == false) return false
+            }
+            return true
         }
+        if (typeof json !== 'object') return false
+
+        const prototype = Object.getPrototypeOf(json)
+        if (prototype !== null && prototype !== Object.prototype) return false
+        for (const value of Object.values(json)) {
+            if (isValidJsonObject(value) == false) return false
+        }
+        return true
     }
 
 
