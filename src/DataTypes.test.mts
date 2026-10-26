@@ -224,6 +224,19 @@ test('isEqual (14)', () => {
     expect(DataTypes.isEqual(x,y)).toEqual(false)
 })
 
+test('isEqual propagates options through arrays', () => {
+    expect(DataTypes.isEqual(
+        ['VALUE', {nested: 'TEXT'}],
+        ['value', {nested: 'text'}],
+        {ignoreCaseInStrings: true}
+    )).toBe(true)
+    expect(DataTypes.isEqual(
+        [{value: 'same', optional: null}],
+        [{value: 'same'}],
+        {ignoreNullAndUndefinedValuesInObject: true}
+    )).toBe(true)
+})
+
 test('isEqual two object with different keys length (1)', () => {
     const x = {a:'a', b:'b', c:undefined}
     const y = {a:'a', b:'b', c:null}

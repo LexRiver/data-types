@@ -107,7 +107,7 @@ export namespace DataTypes {
         }
         if (isArray(x) && isArray(y) && x.length == y.length) {
             for (let i = 0; i < x.length; i++) {
-                if (isEqual(x[i], y[i]) == false) return false
+                if (isEqual(x[i], y[i], options) == false) return false
             }
             return true
         }
