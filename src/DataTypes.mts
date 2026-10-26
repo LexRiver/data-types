@@ -95,6 +95,9 @@ export namespace DataTypes {
                 if(typeof x === 'string' && typeof y === 'string' && options?.ignoreCaseInStrings){
                     return x.toLocaleLowerCase() === y.toLocaleLowerCase()
                 }
+                if(typeof x === 'number' && typeof y === 'number'){
+                    return Number.isNaN(x) && Number.isNaN(y)
+                }
                 return x === y
             }
             return false

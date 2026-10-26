@@ -118,6 +118,13 @@ test('isEqual (5)', () => {
     expect(DataTypes.isEqual(x,y)).toEqual(true)
 })
 
+test('isEqual treats NaN values as equal', () => {
+    expect(DataTypes.isEqual(NaN, NaN)).toBe(true)
+    expect(DataTypes.isEqual(NaN, 0)).toBe(false)
+    expect(DataTypes.isEqual({key: NaN}, {key: NaN})).toBe(true)
+    expect(DataTypes.isEqual([NaN], [NaN])).toBe(true)
+})
+
 test('isEqual (6)', () => {
     const x = new Date('2019-11-12')
     const y = new Date('2019-11-12')
